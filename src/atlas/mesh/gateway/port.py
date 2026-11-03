@@ -4,6 +4,14 @@ from dataclasses import dataclass
 from typing import Any, Protocol
 
 
+class InferenceError(RuntimeError):
+    """Error explícito al ejecutar una solicitud mediante un motor de inferencia."""
+
+
+class InferenceUnavailable(InferenceError):
+    """El motor de inferencia no respondió o no pudo establecerse la conexión."""
+
+
 @dataclass(frozen=True)
 class InferenceRequest:
     model_id: str
@@ -25,7 +33,10 @@ class InferenceResult:
     engine: str
 
 
-class InferencePort(Protocol):
+class InferenceProvider(Protocol):
     """Contrato que el resto de ATLAS conoce. Cada motor lo implementa en un adaptador."""
 
     def generate(self, request: InferenceRequest) -> InferenceResult: ...
+
+
+InferencePort = InferenceProvider

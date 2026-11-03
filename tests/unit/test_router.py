@@ -1,3 +1,5 @@
+from dataclasses import replace
+
 import pytest
 
 from atlas.guardian.policy import DataClass, TrustTier
@@ -12,7 +14,9 @@ BIG = ModelSpec("big-14b-q4", "x", "q4", int(8.5 * GIB), 48, 8, 128, 32768,
 UNAPPROVED = ModelSpec("rogue", "x", "q4", GIB, 10, 4, 64, 8192, frozenset({"general"}), "sha256:c")
 MODELS = {m.model_id: m for m in (SMALL, BIG, UNAPPROVED)}
 
-A = NodeInfo("A-8gb", TrustTier.T1, 8 * GIB, 7 * GIB, frozenset({"small-3b-q4", "big-14b-q4", "rogue"}))
+A = NodeInfo(
+    "A-8gb", TrustTier.T1, 8 * GIB, 7 * GIB, frozenset({"small-3b-q4", "big-14b-q4", "rogue"})
+)
 B = NodeInfo("B-16gb", TrustTier.T3, 16 * GIB, 14 * GIB, frozenset({"small-3b-q4", "big-14b-q4"}))
 
 
@@ -51,7 +55,9 @@ def test_unapproved_model_never_routed_and_reasons_reported():
 
 def test_capabilities_unhealthy_and_context():
     assert route(_task(capabilities=frozenset({"coding"})), [A, B], MODELS).model_id == "big-14b-q4"
-    sick = NodeInfo("S", TrustTier.T3, 16 * GIB, 14 * GIB, frozenset({"small-3b-q4"}), healthy=False)
+    sick = NodeInfo(
+        "S", TrustTier.T3, 16 * GIB, 14 * GIB, frozenset({"small-3b-q4"}), healthy=False
+    )
     with pytest.raises(NoEligibleCandidate):
         route(_task(), [sick], MODELS)
     with pytest.raises(NoEligibleCandidate):
@@ -61,3 +67,55 @@ def test_capabilities_unhealthy_and_context():
 def test_unsupported_strategy_fails_loudly():
     with pytest.raises(UnsupportedStrategy):
         route(_task(strategy=Strategy.HYBRID), [B], MODELS)
+
+
+def test_latency_limit_requires_measured_latency_and_filters_slow_models():
+    measured = replace(SMALL, eval_latency_ms=900)
+    fast = replace(BIG, eval_latency_ms=300)
+    nodes = [
+        NodeInfo("fast", TrustTier.T3, 16 * GIB, 14 * GIB, frozenset({fast.model_id})),
+        NodeInfo("slow", TrustTier.T3, 16 * GIB, 14 * GIB, frozenset({measured.model_id})),
+        NodeInfo("unknown", TrustTier.T3, 16 * GIB, 14 * GIB, frozenset({UNAPPROVED.model_id})),
+    ]
+    models = {model.model_id: model for model in (measured, fast, UNAPPROVED)}
+
+    assignment = route(_task(max_latency_ms=500), nodes, models)
+
+    assert assignment.model_id == fast.model_id
+
+
+def test_latency_limit_rejects_models_without_measurement():
+    unknown_latency = replace(SMALL, model_id="unknown-latency")
+    node = NodeInfo(
+        "unknown", TrustTier.T3, 16 * GIB, 14 * GIB, frozenset({unknown_latency.model_id})
+    )
+
+    with pytest.raises(NoEligibleCandidate, match="latencia sin medir"):
+        route(_task(max_latency_ms=500), [node], {unknown_latency.model_id: unknown_latency})
+
+
+def test_latency_limit_must_be_positive():
+    with pytest.raises(ValueError, match="max_latency_ms"):
+        route(_task(max_latency_ms=0), [B], MODELS)
+
+
+def test_invalid_measured_latency_is_rejected():
+    invalid = replace(SMALL, eval_latency_ms=-1)
+    node = NodeInfo(
+        "node", TrustTier.T3, 16 * GIB, 14 * GIB, frozenset({invalid.model_id})
+    )
+
+    with pytest.raises(NoEligibleCandidate, match="latencia medida inválida"):
+        route(_task(), [node], {invalid.model_id: invalid})
+
+
+def test_measured_latency_breaks_quality_ties():
+    slower = replace(SMALL, model_id="slower", eval_latency_ms=400)
+    faster = replace(SMALL, model_id="faster", eval_latency_ms=200)
+    node = NodeInfo(
+        "node", TrustTier.T3, 16 * GIB, 14 * GIB, frozenset({slower.model_id, faster.model_id})
+    )
+
+    assert route(
+        _task(), [node], {slower.model_id: slower, faster.model_id: faster}
+    ).model_id == faster.model_id
