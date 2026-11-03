@@ -1,0 +1,45 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "atlas-genesis"
+version = "0.1.0"
+description = "IA persistente, evolutiva y distribuida: identidad y memoria independientes del modelo."
+readme = "README.md"
+requires-python = ">=3.12"
+# Núcleo determinista: solo `cryptography`. El resto son bordes (API, motores de inferencia).
+dependencies = [
+    "cryptography>=42",
+    "httpx>=0.27",
+    "fastapi>=0.110",
+    "uvicorn>=0.29",
+]
+
+[project.optional-dependencies]
+db = ["psycopg[binary]>=3.1"]
+dev = ["pytest>=8", "ruff>=0.5", "mypy>=1.10", "import-linter>=2.0"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/atlas", "src/atlas_node"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+markers = [
+    "integration: requiere servicios externos (Postgres, Ollama)",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "S"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["S101"]
+
+[tool.mypy]
+strict = true
+mypy_path = "src"

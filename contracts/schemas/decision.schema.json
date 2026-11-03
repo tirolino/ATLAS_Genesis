@@ -1,0 +1,28 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "action": {
+      "enum": [
+        "respond",
+        "call_tool",
+        "ask_clarification",
+        "refuse"
+      ],
+      "type": "string"
+    },
+    "arguments": {
+      "type": "object"
+    },
+    "message": {
+      "maxLength": 8000,
+      "type": "string"
+    },
+    "tool": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "action"
+  ],
+  "type": "object"
+}
