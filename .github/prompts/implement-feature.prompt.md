@@ -1,5 +1,5 @@
 ---
-mode: agent
+agent: agent
 description: Analiza, planifica, implementa y valida una funcionalidad Python.
 ---
 

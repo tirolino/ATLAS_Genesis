@@ -1,4 +1,5 @@
 ---
+description: "Usa al crear o modificar pruebas pytest o al validar cambios del proyecto."
 applyTo: "tests/**/*.py"
 ---
 

@@ -1,4 +1,5 @@
 ---
+description: "Usa al diseñar o modificar módulos Python, capas, dependencias o límites arquitectónicos."
 applyTo: "src/**/*.py"
 ---
 

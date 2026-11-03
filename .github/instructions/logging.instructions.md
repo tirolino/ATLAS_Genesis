@@ -1,4 +1,5 @@
 ---
+description: "Usa al añadir o cambiar logging, diagnóstico, eventos o manejo de errores en Python."
 applyTo: "**/*.py"
 ---
 

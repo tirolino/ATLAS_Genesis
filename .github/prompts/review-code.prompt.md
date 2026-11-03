@@ -1,5 +1,5 @@
 ---
-mode: agent
+agent: agent
 description: Revisa código Python en busca de defectos, riesgos y deuda técnica.
 ---
 
