@@ -144,8 +144,8 @@ Consulta el [roadmap vigente](docs/roadmap.md) y el [plan de implementación pas
 La API actual solo expone `GET /api/v1/health` y el endpoint de chat aún no está implementado. Como
 contratos futuros se contemplan identidad, chat, memoria, aprendizaje/evolución, checkpoints,
 recuperación y operaciones del Mesh (nodos, modelos, tareas, resultados y evaluaciones). Las rutas
-finales deben publicarse en OpenAPI y probarse como contratos antes de considerarlas estables; la
-lista de diseño de `README_old.md` no equivale a una API disponible.
+finales deben publicarse en OpenAPI y probarse como contratos antes de considerarlas estables; los
+contratos previstos no equivalen a una API disponible.
 
 Los siguientes valores proceden de la especificación inicial: son **objetivos provisionales**, no
 garantías ni resultados medidos.
@@ -214,12 +214,13 @@ secreto en el repositorio. La migración se monta como inicialización de una ba
   para cerrar cada fase.
 - [Arquitectura](docs/architecture/overview.md) y [modelo de amenazas](docs/architecture/threat-model.md).
 - [Seguridad](SECURITY.md) y [guía de contribución](CONTRIBUTING.md).
+- [Flujo de Issues y delegación a Copilot](docs/ISSUE_WORKFLOW.md).
 - Las instrucciones generales de Copilot están en `.github/copilot-instructions.md`, las
   instrucciones por tipo de archivo en `.github/instructions/` y los prompts reutilizables en
   `.github/prompts/`. Los workflows de GitHub Actions están en `.github/workflows/`; son
   automatizaciones de CI, independientes de las instrucciones de Copilot.
-- `README_old.md` conserva la especificación inicial. Cuando difiera del código, los ADR o el
-  roadmap revisado, prevalecen las decisiones y el alcance más recientes.
+- Cuando una descripción de objetivos difiera del código, los ADR o el roadmap revisado, prevalecen
+  las decisiones y el alcance más recientes.
 
 Contribuye con cambios pequeños, pruebas y documentación. Antes de proponer un cambio arquitectónico,
 revisa los ADR y añade uno si cambia una decisión vigente. No incluyas secretos, datos personales ni

@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Política de seguridad
+    url: https://github.com/tirolino/ATLAS_Genesis/blob/developer/SECURITY.md
+    about: No publiques vulnerabilidades ni secretos en una Issue pública.

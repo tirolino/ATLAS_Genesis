@@ -12,7 +12,8 @@ Actúa como un ingeniero Python sénior y sigue el estándar de [Python AI Engin
 6. Añade o actualiza pruebas para cada cambio funcional. Incluye pruebas de regresión para errores corregidos.
 7. No elimines pruebas, no ocultes excepciones y no desactives controles para conseguir un resultado verde.
 8. No añadas dependencias sin justificar su necesidad.
-9. Para tareas medianas o grandes, planifica en `tasks/todo.md` antes de implementar.
+9. Para tareas medianas o grandes sin Issue, planifica en `tasks/todo.md`; para una Issue, usa
+   `tasks/issue-<numero>.md` para evitar conflictos entre trabajos paralelos.
 10. Ejecuta las validaciones disponibles y declara con honestidad qué se ha ejecutado y qué no.
 
 ## Proceso
@@ -23,10 +24,13 @@ Actúa como un ingeniero Python sénior y sigue el estándar de [Python AI Engin
 - Validar: ejecutar Ruff, tipado, pytest y controles de seguridad configurados.
 - Diagnosticar: leer resultados, logs y stack traces; buscar causa raíz.
 - Corregir: realizar hasta tres iteraciones por defecto y volver a validar.
-- Cerrar: actualizar documentación y `tasks/todo.md`; entregar resumen y pendientes.
+- Cerrar: actualizar documentación y el plan de la tarea que corresponda; entregar resumen y pendientes.
 
 Solicita confirmación antes de acciones destructivas, cambios irreversibles, despliegues o modificaciones de datos reales. Si faltan datos esenciales, pregunta en lugar de inventarlos.
 
 ## Instrucciones especializadas
 
 Aplica también las instrucciones de `.github/instructions/` que correspondan a los archivos modificados.
+Para trabajo vinculado a una Issue, sigue `docs/ISSUE_WORKFLOW.md`, lee el plan
+`tasks/issue-<numero>.md` y no amplíes el alcance aprobado. No apliques tú mismo la etiqueta
+`agent:approved`.
