@@ -31,6 +31,7 @@ class ModelSpec:
     approved: bool = False
     # Medido por el Model Evaluator (benchmarks propios), NUNCA autodeclarado por el nodo.
     eval_score: float | None = None
+    eval_latency_ms: int | None = None
 
 
 @dataclass(frozen=True)
@@ -54,6 +55,7 @@ class TaskRequest:
     capabilities: frozenset[str] = frozenset()
     strategy: Strategy = Strategy.AUTO
     concurrency: int = 1
+    max_latency_ms: int | None = None
 
 
 @dataclass(frozen=True)

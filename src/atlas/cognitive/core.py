@@ -15,7 +15,11 @@ from atlas.cognitive.contracts import (
     Decision,
     parse_decision,
 )
-from atlas.mesh.gateway.port import InferencePort, InferenceRequest
+from atlas.mesh.gateway.port import (
+    InferenceError,
+    InferenceProvider,
+    InferenceRequest,
+)
 from atlas.mesh.models import ModelSpec, NodeInfo, TaskRequest
 from atlas.mesh.router import NoEligibleCandidate, route
 from atlas.mesh.validator import ModelResult
@@ -33,7 +37,7 @@ class CognitiveCore:
         *,
         nodes: Callable[[], Sequence[NodeInfo]],
         models: Mapping[str, ModelSpec],
-        gateways: Mapping[str, InferencePort],
+        gateways: Mapping[str, InferenceProvider],
         audit: AuditLog,
         allowed_tools: frozenset[str] = frozenset(),
     ) -> None:
@@ -55,12 +59,21 @@ class CognitiveCore:
             self._audit.append("task.unroutable", {
                 "task_id": task.task_id, "reasons": list(exc.reasons)[:20]})
             raise
-        result = self._gateways[assignment.node_id].generate(InferenceRequest(
-            model_id=assignment.model_id,
-            messages=({"role": "system", "content": SYSTEM_PROMPT},
-                      {"role": "user", "content": user_message}),
-            json_schema=DECISION_SCHEMA,
-        ))
+        try:
+            result = self._gateways[assignment.node_id].generate(InferenceRequest(
+                model_id=assignment.model_id,
+                messages=({"role": "system", "content": SYSTEM_PROMPT},
+                          {"role": "user", "content": user_message}),
+                json_schema=DECISION_SCHEMA,
+            ))
+        except InferenceError as exc:
+            self._audit.append("inference.failed", {
+                "task_id": task.task_id,
+                "node_id": assignment.node_id,
+                "model_id": assignment.model_id,
+                "error_type": type(exc).__name__,
+            })
+            raise
         self._audit.append("inference.completed", {
             "task_id": task.task_id, "node_id": result.node_id, "model_id": result.model_id,
             "engine": result.engine, "latency_ms": result.latency_ms,

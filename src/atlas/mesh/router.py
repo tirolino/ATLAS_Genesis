@@ -1,8 +1,8 @@
 """Model Router del MVP: estrategia SINGLE con filtros duros y heurística de VRAM (ADR-0005).
 
-Orden: (1) filtros obligatorios de seguridad/compatibilidad; (2) ranking por calidad medida
-y, a igualdad, menor consumo de VRAM. Las demás estrategias fallan de forma explícita en lugar
-de degradarse en silencio.
+Orden: (1) filtros obligatorios de seguridad/compatibilidad; (2) ranking por calidad medida,
+latencia medida y consumo estimado de VRAM. Las demás estrategias fallan de forma explícita
+en lugar de degradarse en silencio.
 """
 
 from __future__ import annotations
@@ -37,15 +37,19 @@ def route(
 ) -> Assignment:
     if task.strategy not in supported:
         raise UnsupportedStrategy(f"estrategia {task.strategy.value} no habilitada todavía")
+    if task.max_latency_ms is not None and task.max_latency_ms <= 0:
+        raise ValueError("max_latency_ms debe ser mayor que cero")
 
     reasons: list[str] = []
-    candidates: list[tuple[float, int, str, str]] = []
+    candidates: list[tuple[float, float, int, str, str]] = []
     for node in nodes:
         if not node.healthy:
             reasons.append(f"{node.node_id}: no saludable")
             continue
         if not can_send(task.data_class, node.trust):
-            reasons.append(f"{node.node_id}: {node.trust.name} no autorizado para {task.data_class.name}")
+            reasons.append(
+                f"{node.node_id}: {node.trust.name} no autorizado para {task.data_class.name}"
+            )
             continue
         budget = node.vram_free_bytes * (1.0 - safety_margin)
         for model_id in sorted(node.installed_models):
@@ -59,13 +63,30 @@ def route(
                 reasons.append(f"{tag}: faltan capacidades")
             elif task.min_context_tokens > model.max_context:
                 reasons.append(f"{tag}: contexto insuficiente")
+            elif model.eval_latency_ms is not None and model.eval_latency_ms < 0:
+                reasons.append(f"{tag}: latencia medida inválida")
+            elif task.max_latency_ms is not None and model.eval_latency_ms is None:
+                reasons.append(f"{tag}: latencia sin medir")
+            elif (
+                task.max_latency_ms is not None
+                and model.eval_latency_ms is not None
+                and model.eval_latency_ms > task.max_latency_ms
+            ):
+                reasons.append(f"{tag}: latencia superior al límite")
             else:
                 est = estimate_vram_bytes(model, task.min_context_tokens, task.concurrency)
                 if est > budget:
                     reasons.append(f"{tag}: VRAM insuficiente")
                 else:
-                    candidates.append((-(model.eval_score or 0.0), est, node.node_id, model_id))
+                    latency = (
+                        float(model.eval_latency_ms)
+                        if model.eval_latency_ms is not None
+                        else float("inf")
+                    )
+                    candidates.append(
+                        (-(model.eval_score or 0.0), latency, est, node.node_id, model_id)
+                    )
     if not candidates:
         raise NoEligibleCandidate(reasons)
-    _, est, node_id, model_id = min(candidates)
+    _, _, est, node_id, model_id = min(candidates)
     return Assignment(node_id=node_id, model_id=model_id, estimated_vram_bytes=est)

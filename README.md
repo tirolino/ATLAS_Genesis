@@ -65,9 +65,19 @@ Principios adoptados en los [ADR](docs/adr/):
 ## Model Mesh
 
 El Model Mesh abstrae el catálogo de modelos, sus capacidades y recursos, la selección de nodos, la
-ejecución mediante un gateway y la validación del resultado. El router del MVP filtra por salud del
-nodo, confianza, clase de datos, aprobación del modelo, capacidades, contexto y VRAM estimada; luego
-ordena por calidad medida y consumo estimado.
+ejecución mediante un gateway y la validación del resultado. `InferenceProvider` (también disponible
+con el nombre previo `InferencePort`) define el contrato independiente del motor; `OllamaAdapter`
+lo implementa usando la API local de chat de Ollama, sin SDK propietario. El gateway respeta el
+timeout solicitado, admite salida JSON Schema y comunica timeouts, fallos de transporte, errores HTTP
+y respuestas inválidas como errores explícitos. El núcleo registra `inference.failed` con el tipo
+de error y la asignación fallida, sin incluir el prompt ni la respuesta, y vuelve a propagar el error.
+
+El router del MVP filtra por salud del nodo, confianza, clase de datos, aprobación del modelo,
+capacidades, contexto y VRAM estimada. Puede limitar la latencia usando `TaskRequest.max_latency_ms`;
+solo la métrica medida `ModelSpec.eval_latency_ms` satisface ese límite. Después ordena por calidad
+medida, latencia medida disponible y consumo estimado. Sin un límite de latencia, no tener esa
+métrica no excluye al modelo. El adaptador debe configurarse con el endpoint de un motor local
+confiable; no envía prompts a un servicio comercial.
 
 | Estrategia | Alcance |
 |---|---|
