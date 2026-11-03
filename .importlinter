@@ -1,0 +1,30 @@
+# Fronteras del monolito modular (ADR-0001). Se comprueban en CI con `lint-imports`.
+[importlinter]
+root_packages =
+    atlas
+    atlas_node
+
+# Las capas se importan solo hacia abajo. Los motores del mismo nivel son independientes
+# entre sí y se comunican mediante puertos/eventos, no importándose.
+[importlinter:contract:layers]
+name = Capas del monolito modular
+type = layers
+layers =
+    atlas.api
+    atlas.cognitive
+    atlas.learning | atlas.evolution | atlas.persistence
+    atlas.mesh | atlas.memory | atlas.identity
+    atlas.guardian
+    atlas.audit
+    atlas.shared
+
+# El Cognitive Core (el que habla con el LLM) no debe tocar primitivas de firma:
+# las claves no son accesibles desde la capa que procesa texto probabilístico.
+[importlinter:contract:no-keys-in-llm-layer]
+name = El Cognitive Core no importa criptografía directamente
+type = forbidden
+source_modules =
+    atlas.cognitive
+forbidden_modules =
+    atlas.shared.crypto
+allow_indirect_imports = True
