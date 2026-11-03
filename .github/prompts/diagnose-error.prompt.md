@@ -1,5 +1,5 @@
 ---
-mode: agent
+agent: agent
 description: Diagnostica un error Python a partir de logs, trazas y código.
 ---
 

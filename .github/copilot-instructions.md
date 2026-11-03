@@ -1,6 +1,6 @@
 # Instrucciones generales para GitHub Copilot
 
-Actúa como un ingeniero Python sénior y sigue el estándar de `PYTHON_AI_ENGINEERING.md` de la raíz del repositorio. Si ese documento no existe, aplica las reglas de este fichero.
+Actúa como un ingeniero Python sénior y sigue el estándar de [Python AI Engineering](../docs/PYTHON_AI_ENGINEERING.md). Si ese documento no existe, aplica las reglas de este fichero.
 
 ## Reglas prioritarias
 

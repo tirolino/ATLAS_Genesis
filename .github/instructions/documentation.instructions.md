@@ -1,5 +1,6 @@
 ---
-applyTo: "**/*.py"
+description: "Usa al crear o actualizar README, documentación, guías, contratos o ejemplos del proyecto."
+applyTo: "**/*.md"
 ---
 
 # Documentación

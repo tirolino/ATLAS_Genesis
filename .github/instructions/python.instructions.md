@@ -1,4 +1,5 @@
 ---
+description: "Usa al escribir o modificar código Python; cubre estilo, tipado, APIs y errores."
 applyTo: "**/*.py"
 ---
 

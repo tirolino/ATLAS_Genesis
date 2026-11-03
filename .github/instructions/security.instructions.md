@@ -1,4 +1,5 @@
 ---
+description: "Usa al tratar entradas externas, autenticación, secretos, dependencias, red o límites de confianza."
 applyTo: "**/*.py"
 ---
 
