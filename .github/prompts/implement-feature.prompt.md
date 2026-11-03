@@ -7,7 +7,7 @@ Implementa la funcionalidad descrita por el usuario siguiendo las instrucciones 
 
 1. Inspecciona el código, arquitectura, dependencias y pruebas relacionadas.
 2. Resume el comportamiento actual y los cambios necesarios.
-3. Para cambios medianos o grandes, escribe un plan en `tasks/todo.md` con archivos afectados, criterios de aceptación, riesgos y pruebas.
+3. Para cambios medianos o grandes sin Issue, escribe un plan en `tasks/todo.md`; con Issue, usa `tasks/issue-<numero>.md`. Incluye archivos afectados, criterios de aceptación, riesgos y pruebas.
 4. Implementa el cambio mínimo y mantenible. No refactorices áreas no relacionadas.
 5. Añade o actualiza pruebas unitarias, de integración o regresión según corresponda.
 6. Ejecuta los controles configurados: Ruff, formato, tipado, pytest y seguridad cuando estén disponibles.

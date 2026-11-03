@@ -1,0 +1,41 @@
+name: Funcionalidad
+description: Propón una capacidad o mejora para ATLAS Genesis.
+title: "[Funcionalidad]: "
+labels:
+  - enhancement
+body:
+  - type: markdown
+    attributes:
+      value: >-
+        Describe el problema y el resultado que buscas. No incluyas secretos,
+        datos personales ni contenido privado.
+  - type: textarea
+    id: goal
+    attributes:
+      label: Objetivo
+      description: ¿Qué necesidad resolvería y para quién?
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Criterios de aceptación (si se conocen)
+      description: El análisis propondrá criterios verificables antes de implementar.
+      placeholder: |
+        - [ ] ...
+    validations:
+      required: false
+  - type: textarea
+    id: architecture
+    attributes:
+      label: Contexto arquitectónico
+      description: Módulos, ADR o contratos que podrían verse afectados.
+    validations:
+      required: false
+  - type: textarea
+    id: constraints
+    attributes:
+      label: Restricciones y riesgos
+      description: Compatibilidad, seguridad, privacidad, coste o requisitos operativos.
+    validations:
+      required: false
